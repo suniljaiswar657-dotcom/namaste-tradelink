@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Namaste Tradelink Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+<div id="loginBox" class="box">
+  <h1>Namaste Tradelink</h1>
+  <p>Owner Admin Login</p>
+
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+
+  <button id="login">Login</button>
+
+  <small>Default: admin / namaste123</small>
+</div>
+
+<div id="dashboard" hidden>
+
+  <header>
+    <div>
+      <b>Namaste Tradelink</b>
+      <small>Owner Dashboard</small>
+    </div>
+
+    <div>
+      <a href="/">Store</a>
+      <button id="logout">Logout</button>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="stats">
+      <div>
+        <span>Total Orders</span>
+        <b id="ordersCount">0</b>
+      </div>
+
+      <div>
+        <span>Order Value</span>
+        <b id="orderValue">₹0</b>
+      </div>
+
+      <div>
+        <span>Total Stock</span>
+        <b id="stockCount">0</b>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Store Settings</h2>
+
+      <input id="sName" placeholder="Store name">
+      <input id="sPhone" placeholder="Phone">
+      <input id="sWhatsApp" placeholder="WhatsApp">
+      <input id="sUpi" placeholder="UPI ID">
+      <input id="sAddress" placeholder="Address">
+      <input id="sMaps" placeholder="Google Maps URL">
+
+      <button id="saveStore">Save Store</button>
+    </section>
+
+    <section class="panel">
+
+      <h2>Products</h2>
+
+      <div class="productForm">
+        <input id="pName" placeholder="Product name">
+        <input id="pCategory" placeholder="Category">
+        <input id="pPrice" type="number" placeholder="Price">
+        <input id="pStock" type="number" placeholder="Stock">
+        <input id="pIcon" placeholder="Icon e.g. 📱">
+
+        <button id="addProduct">
+          Add Product
+        </button>
+      </div>
+
+      <div id="products"></div>
+
+    </section>
+
+    <section class="panel">
+
+      <h2>Orders</h2>
+
+      <div id="orders"></div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
