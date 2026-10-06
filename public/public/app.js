@@ -9,44 +9,69 @@ const $ = (id) => document.getElementById(id);
 
 async function loadStore() {
   try {
-    const res = await fetch("/api/store");
+    const res = await fetch("/api/store", {
+      cache: "no-store"
+    });
+
+    if (!res.ok) {
+      throw new Error("API error " + res.status);
+    }
+
     const data = await res.json();
 
-    state.store = data.store;
-    state.products = data.products || [];
+    console.log("STORE DATA:", data);
+
+    state.store = data.store || {};
+    state.products = Array.isArray(data.products)
+      ? data.products
+      : [];
 
     renderStore();
     renderCategories();
     renderProducts();
   } catch (err) {
-    console.error(err);
+    console.error("LOAD ERROR:", err);
+
+    $("phone").textContent = "9833667188";
+    $("address").textContent = "Kalyan, Maharashtra";
+
     $("products").innerHTML =
-      "<p>Store data load nahi ho raha. Please refresh.</p>";
+      "<p>Products load nahi ho rahe. Please refresh.</p>";
   }
 }
 
 function renderStore() {
-  const s = state.store;
+  const s = state.store || {};
 
-  $("phone").textContent = s.phone || "9833667188";
-  $("call").href = "tel:" + (s.phone || "9833667188");
+  const phone = s.phone || "9833667188";
+  const whatsapp = s.whatsapp || "919833667188";
 
-  $("address").textContent = s.address || "";
-  $("map").href = s.maps || "#";
+  $("phone").textContent = phone;
+
+  $("call").href =
+    "tel:" + phone;
+
+  $("address").textContent =
+    s.address ||
+    "Kalyan, Maharashtra";
+
+  $("map").href =
+    s.maps ||
+    "https://www.google.com/maps/search/?api=1&query=Namaste+Tradelink+Kalyan";
+
   $("map").target = "_blank";
 
-  const wa = s.whatsapp || "919833667188";
-
   $("wa").href =
-    "https://wa.me/" + wa;
+    "https://wa.me/" + whatsapp;
 
   $("wa").target = "_blank";
 
   $("heroWa").href =
-    "https://wa.me/" + wa +
+    "https://wa.me/" +
+    whatsapp +
     "?text=" +
     encodeURIComponent(
-      "Hello Namaste Tradelink, mujhe mobile/electronics ke baare mein enquiry karni hai."
+      "Hello Namaste Tradelink 👋 Mujhe mobile/electronics ke baare mein enquiry karni hai."
     );
 
   $("heroWa").target = "_blank";
@@ -62,83 +87,113 @@ function renderCategories() {
     )
   ];
 
-  $("cats").innerHTML = categories
-    .map(c => `
+  $("cats").innerHTML =
+    categories.map(category => `
       <button
-        class="${state.category === c ? "active" : ""}"
-        onclick="setCategory('${escapeHtml(c)}')"
+        class="${state.category === category ? "active" : ""}"
+        onclick="setCategory(${JSON.stringify(category)})"
       >
-        ${escapeHtml(c)}
+        ${escapeHtml(category)}
       </button>
-    `)
-    .join("");
+    `).join("");
 }
 
 function setCategory(category) {
   state.category = category;
+
   renderCategories();
   renderProducts();
 }
 
 function renderProducts() {
-  const q = ($("q").value || "").toLowerCase().trim();
+  const search =
+    ($("q").value || "")
+      .toLowerCase()
+      .trim();
 
-  let list = state.products.filter(p => {
-    const categoryOK =
-      state.category === "All" ||
-      p.category === state.category;
+  const products =
+    state.products.filter(product => {
 
-    const searchOK =
-      !q ||
-      String(p.name).toLowerCase().includes(q) ||
-      String(p.category).toLowerCase().includes(q);
+      const categoryOK =
+        state.category === "All" ||
+        product.category === state.category;
 
-    return categoryOK && searchOK;
-  });
+      const searchOK =
+        !search ||
+        String(product.name)
+          .toLowerCase()
+          .includes(search) ||
+        String(product.category)
+          .toLowerCase()
+          .includes(search);
 
-  if (!list.length) {
+      return categoryOK && searchOK;
+    });
+
+  if (!products.length) {
     $("products").innerHTML =
       "<p>No products found.</p>";
     return;
   }
 
-  $("products").innerHTML = list.map(p => `
-    <article class="card">
-      <div class="icon">${p.icon || "📦"}</div>
+  $("products").innerHTML =
+    products.map(product => {
 
-      <h3>${escapeHtml(p.name)}</h3>
+      const price =
+        Number(product.price) || 0;
 
-      <p>${escapeHtml(p.category || "Product")}</p>
+      const stock =
+        Number(product.stock) || 0;
 
-      <div class="price">
-        ${
-          Number(p.price) > 0
-            ? "₹" + Number(p.price).toLocaleString("en-IN")
-            : "Price on enquiry"
-        }
-      </div>
+      return `
+        <article class="card">
 
-      <p>
-        ${
-          Number(p.stock) > 0
-            ? "Stock: " + p.stock
-            : "Stock confirmation available"
-        }
-      </p>
+          <div class="icon">
+            ${escapeHtml(product.icon || "📦")}
+          </div>
 
-      <button onclick="addToCart(${p.id})">
-        Add to Cart
-      </button>
-    </article>
-  `).join("");
+          <h3>
+            ${escapeHtml(product.name)}
+          </h3>
+
+          <p>
+            ${escapeHtml(product.category || "Product")}
+          </p>
+
+          <div class="price">
+            ${
+              price > 0
+                ? "₹" + price.toLocaleString("en-IN")
+                : "Price on enquiry"
+            }
+          </div>
+
+          <p>
+            ${
+              stock > 0
+                ? "Stock: " + stock
+                : "Stock confirmation available"
+            }
+          </p>
+
+          <button onclick="addToCart(${product.id})">
+            Add to Cart
+          </button>
+
+        </article>
+      `;
+
+    }).join("");
 }
 
 function addToCart(id) {
-  const product = state.products.find(p => p.id === id);
+  const product =
+    state.products.find(p => p.id === id);
 
   if (!product) return;
 
-  const existing = state.cart.find(x => x.id === id);
+  const existing =
+    state.cart.find(item => item.id === id);
 
   if (existing) {
     existing.qty++;
@@ -156,12 +211,15 @@ function addToCart(id) {
 }
 
 function removeFromCart(id) {
-  state.cart = state.cart.filter(x => x.id !== id);
+  state.cart =
+    state.cart.filter(item => item.id !== id);
+
   renderCart();
 }
 
 function changeQty(id, amount) {
-  const item = state.cart.find(x => x.id === id);
+  const item =
+    state.cart.find(x => x.id === id);
 
   if (!item) return;
 
@@ -176,10 +234,11 @@ function changeQty(id, amount) {
 }
 
 function renderCart() {
-  const count = state.cart.reduce(
-    (sum, item) => sum + item.qty,
-    0
-  );
+  const count =
+    state.cart.reduce(
+      (total, item) => total + item.qty,
+      0
+    );
 
   $("cartCount").textContent = count;
 
@@ -188,40 +247,66 @@ function renderCart() {
       "<p>Your cart is empty.</p>";
 
     $("sum").textContent = "₹0";
+
     return;
   }
 
-  $("cartItems").innerHTML = state.cart.map(item => `
-    <div class="cartrow">
+  $("cartItems").innerHTML =
+    state.cart.map(item => `
 
-      <div>
-        <b>${escapeHtml(item.name)}</b>
-        <div>
-          ${
-            item.price > 0
-              ? "₹" + item.price.toLocaleString("en-IN")
-              : "Price on enquiry"
-          }
-        </div>
+      <div class="cartrow">
 
         <div>
-          <button onclick="changeQty(${item.id},-1)">−</button>
-          ${item.qty}
-          <button onclick="changeQty(${item.id},1)">+</button>
+
+          <b>
+            ${escapeHtml(item.name)}
+          </b>
+
+          <div>
+            ${
+              item.price > 0
+                ? "₹" +
+                  item.price.toLocaleString("en-IN")
+                : "Price on enquiry"
+            }
+          </div>
+
+          <div>
+
+            <button
+              onclick="changeQty(${item.id},-1)"
+            >
+              −
+            </button>
+
+            ${item.qty}
+
+            <button
+              onclick="changeQty(${item.id},1)"
+            >
+              +
+            </button>
+
+          </div>
+
         </div>
+
+        <button
+          onclick="removeFromCart(${item.id})"
+        >
+          Remove
+        </button>
+
       </div>
 
-      <button onclick="removeFromCart(${item.id})">
-        Remove
-      </button>
+    `).join("");
 
-    </div>
-  `).join("");
-
-  const total = state.cart.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
+  const total =
+    state.cart.reduce(
+      (sum, item) =>
+        sum + item.price * item.qty,
+      0
+    );
 
   $("sum").textContent =
     total > 0
@@ -240,68 +325,100 @@ function closeCart() {
 }
 
 async function placeOrder() {
+
   if (!state.cart.length) {
     alert("Cart empty hai.");
     return;
   }
 
-  const name = $("name").value.trim();
-  const mobile = $("mobile").value.trim();
-  const note = $("note").value.trim();
+  const name =
+    $("name").value.trim();
+
+  const mobile =
+    $("mobile").value.trim();
+
+  const note =
+    $("note").value.trim();
 
   if (!name || !mobile) {
-    alert("Name aur mobile number enter karo.");
+    alert(
+      "Name aur mobile number enter karo."
+    );
     return;
   }
 
-  const messageLines = [
+  const items =
+    state.cart.map(item => ({
+      id: item.id,
+      qty: item.qty
+    }));
+
+  try {
+
+    await fetch("/api/orders", {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+        name,
+        phone: mobile,
+        note,
+        items
+      })
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Order save error:",
+      error
+    );
+  }
+
+  const message = [
+
     "Hello Namaste Tradelink 👋",
+
     "",
+
     "New Order / Enquiry",
+
     "Name: " + name,
+
     "Mobile: " + mobile,
+
     "",
-    "Products:"
-  ];
 
-  state.cart.forEach(item => {
-    messageLines.push(
-      `• ${item.name} × ${item.qty}`
-    );
-  });
+    "Products:",
 
-  if (note) {
-    messageLines.push("");
-    messageLines.push("Note: " + note);
-  }
+    ...state.cart.map(
+      item =>
+        `• ${item.name} × ${item.qty}`
+    ),
 
-  const total = state.cart.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
+    ...(note
+      ? ["", "Note: " + note]
+      : []),
 
-  if (total > 0) {
-    messageLines.push("");
-    messageLines.push(
-      "Catalogue total: ₹" +
-      total.toLocaleString("en-IN")
-    );
-  }
+    "",
 
-  messageLines.push("");
-  messageLines.push(
     "Please confirm final price and stock."
-  );
 
-  const wa =
+  ].join("\n");
+
+  const whatsapp =
     state.store?.whatsapp ||
     "919833667188";
 
   const url =
     "https://wa.me/" +
-    wa +
+    whatsapp +
     "?text=" +
-    encodeURIComponent(messageLines.join("\n"));
+    encodeURIComponent(message);
 
   window.open(url, "_blank");
 }
