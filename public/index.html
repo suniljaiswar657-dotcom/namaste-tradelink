@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111">
+  <link rel="stylesheet" href="style.css">
+  <title>Namaste Tradelink</title>
+</head>
+
+<body>
+
+<header>
+  <a href="/" class="logo">
+    <b>NT</b>
+    <span>
+      <strong>Namaste Tradelink</strong>
+      <small>Mobile • Electronics • Accessories</small>
+    </span>
+  </a>
+
+  <nav>
+    <a href="#shop">Shop</a>
+    <a href="#visit">Visit</a>
+    <button id="cartOpen">🛒 <i id="cartCount">0</i></button>
+  </nav>
+</header>
+
+<main>
+
+<section class="hero">
+  <div>
+    <label>KALYAN • LOCAL STORE</label>
+    <h1>Mobile shopping,<br><em>simple & local.</em></h1>
+    <p>
+      Live catalogue, stock enquiry, WhatsApp order
+      and offline pickup — all in one place.
+    </p>
+    <a class="btn red" id="heroWa">WhatsApp Order</a>
+  </div>
+
+  <img src="assets/store-front.webp" alt="Namaste Tradelink Store">
+</section>
+
+<section class="trust">
+  <span>✓ Live catalogue</span>
+  <span>✓ WhatsApp orders</span>
+  <span>✓ Offline pickup</span>
+  <span>✓ UPI ready</span>
+</section>
+
+<section id="shop" class="section">
+
+  <div class="title">
+    <div>
+      <label>SHOP</label>
+      <h2>Products</h2>
+    </div>
+  </div>
+
+  <div id="cats" class="cats"></div>
+
+  <div class="search">
+    ⌕
+    <input
+      id="q"
+      placeholder="Search phones, chargers, earbuds..."
+    >
+  </div>
+
+  <div id="products" class="grid"></div>
+
+</section>
+
+<section class="section store">
+
+  <div>
+    <label>STORE</label>
+    <h2>Online enquiry.<br>Offline trust.</h2>
+
+    <p>
+      Choose a product, add it to cart and send the
+      enquiry directly to Namaste Tradelink.
+      Final price and stock are confirmed by the store.
+    </p>
+  </div>
+
+  <img src="assets/store-interior.webp" alt="Store Interior">
+
+</section>
+
+<section id="visit" class="section">
+
+  <label>CONTACT</label>
+  <h2>Visit / Contact</h2>
+
+  <div class="contact">
+
+    <div>
+      📞
+      <b id="phone">Loading...</b>
+      <a id="call">Call</a>
+    </div>
+
+    <div>
+      💬
+      <b>WhatsApp</b>
+      <a id="wa">Chat</a>
+    </div>
+
+    <div>
+      📍
+      <b id="address">Loading...</b>
+      <a id="map">Directions</a>
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  <b>Namaste Tradelink</b>
+  <span>© 2026 • Owner Login</span>
+  <a href="/admin.html">Admin</a>
+</footer>
+
+<div id="shade"></div>
+
+<aside id="cart">
+
+  <header>
+    <h2>Order</h2>
+    <button id="close">×</button>
+  </header>
+
+  <div id="cartItems"></div>
+
+  <div class="checkout">
+
+    <b id="sum">₹0</b>
+
+    <input
+      id="name"
+      placeholder="Your name"
+    >
+
+    <input
+      id="mobile"
+      placeholder="Mobile number"
+    >
+
+    <textarea
+      id="note"
+      placeholder="Model / colour / delivery note"
+    ></textarea>
+
+    <button
+      class="btn red full"
+      id="order"
+    >
+      Place WhatsApp Order
+    </button>
+
+    <small>
+      Stock and final amount are confirmed by the store.
+    </small>
+
+  </div>
+
+</aside>
+
+<script src="app.js"></script>
+
+</body>
+</html>
